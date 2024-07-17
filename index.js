@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 
-const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
+const stripe = require("stripe")(STRIPE_PRIVATE_KEY);
 
 const { createSessionController } = require("./controllers/create-session-controller.js");
 const { getAllProductsController } = require("./controllers/get-all-products-controller.js");
@@ -19,4 +19,4 @@ app.get("/get-all-products", getAllProductsController);
 
 app.post("/create-checkout-session", createSessionController);
 
-app.listen(3001);
+app.listen(process.env.PORT || 3001);
