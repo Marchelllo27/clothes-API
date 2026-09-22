@@ -28,5 +28,5 @@ Copy `.env-example` to `.env` and set `STRIPE_PRIVATE_KEY` (also `CLIENT_URL`, u
 
 ## Gotchas
 
-- In `create-session-controller.js`, `require("stripe")(process.env.STRIPE_PRIVATE_KEY)` runs at module load, before `dotenv` is configured. `api/index.js` requires the controllers first and calls `dotenv.config()` afterwards, so with only a `.env` file the Stripe client is created with an undefined key. It works on Vercel because the variables are already in the environment. Locally, export the variable in the shell or move `dotenv.config()` above the controller requires.
-- `createSessionController` does not handle an `item.id` that isn't in the catalog: `storeItem` is `undefined`, the resulting `TypeError` is caught, and the client gets the generic 500 response.
+- `create-session-controller.js` creates the Stripe client at module load (`require("stripe")(process.env.STRIPE_PRIVATE_KEY)`), so `dotenv.config()` must run before that line. The controller now calls it at the top of the file. `api/index.js` still calls it only after requiring the controllers, so any new module that reads env vars at load time needs its own `dotenv.config()` first.
+- `createSessionController` returns 400 for a missing or empty `items` array and for unknown product ids. Only real failures (catalog fetch, Stripe errors) reach the generic 500. `quantity` is not validated, so a bad value still comes back as a 500.
